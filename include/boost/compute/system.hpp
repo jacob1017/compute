@@ -80,7 +80,7 @@ public:
     }
 
     /// Returns the device with \p name.
-    ///
+    ///提供一个设备的名字，进行查找，遍历整个系统的设备列表
     /// \throws no_device_found if no device with \p name is found.
     static device find_device(const std::string &name)
     {
@@ -98,7 +98,8 @@ public:
 
     /// Returns a vector containing all of the compute devices on
     /// the system.
-    ///
+    ///返回一个列表，包含所有的计算设备对象
+    //遍历了所有的平台platform，然后将所有的平台设备加入到device列表中
     /// For example, to print out the name of each OpenCL-capable device
     /// available on the system:
     /// \code
@@ -113,7 +114,7 @@ public:
         const std::vector<platform> platforms = system::platforms();
         for(size_t i = 0; i < platforms.size(); i++){
             const std::vector<device> platform_devices = platforms[i].devices();
-
+		//从尾部插入，
             devices.insert(
                 devices.end(), platform_devices.begin(), platform_devices.end()
             );
@@ -121,7 +122,7 @@ public:
 
         return devices;
     }
-
+	//返回系统中计算设备的数目
     /// Returns the number of compute devices on the system.
     static size_t device_count()
     {
@@ -136,10 +137,10 @@ public:
     }
 
     /// Returns the default context for the system.
-    ///
+    ///返回系统默认的上下文，由系统中默认的设备创建
     /// The default context is created for the default device on the system
     /// (as returned by default_device()).
-    ///
+    ///在第一次调动时返回，只创建一次，如果多次调用，将返回同一个context
     /// The default context is created once on the first time this function is
     /// called. Calling this function multiple times will always result in the
     /// same context object being returned.
@@ -149,7 +150,7 @@ public:
 
         return default_context;
     }
-
+	//为系统返回一个默认的命令队列
     /// Returns the default command queue for the system.
     static command_queue& default_queue()
     {
@@ -157,7 +158,7 @@ public:
 
         return queue;
     }
-
+	//这个函数会一直被堵塞，知道在默认的命令队列中的计算任务都被完成
     /// Blocks until all outstanding computations on the default
     /// command queue are complete.
     ///
@@ -171,7 +172,7 @@ public:
     }
 
     /// Returns a vector containing each of the OpenCL platforms on the system.
-    ///
+    ///返回系统中所有的OpenCL平台，放在一个列表中
     /// For example, to print out the name of each OpenCL platform present on
     /// the system:
     /// \code
@@ -182,6 +183,7 @@ public:
     static std::vector<platform> platforms()
     {
         cl_uint count = 0;
+		//先统计有多少个platform,这样能够保证申请足够的空间用于存放
         clGetPlatformIDs(0, 0, &count);
 
         std::vector<cl_platform_id> platform_ids(count);
@@ -205,6 +207,12 @@ public:
 
 private:
     /// \internal_
+    /*
+		找到一个默认的设备，注意是最佳匹配的，并返回
+		1.获取系统上的所有的设备，存放到devices_列表中
+		2.获取配置的变量信息
+		3.遍历所有的设备，找到最符合配置信息的设备
+	*/
     static device find_default_device()
     {
         // get a list of all devices on the system
