@@ -212,6 +212,7 @@ private:
 		1.获取系统上的所有的设备，存放到devices_列表中
 		2.获取配置的变量信息
 		3.遍历所有的设备，找到最符合配置信息的设备
+		4.如果没有提供任何的默认配置信息，那么按照GPU CPU, devices_[0]的顺序选取
 	*/
     static device find_default_device()
     {
